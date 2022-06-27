@@ -5,7 +5,12 @@ import {
 } from './cookies';
 import insertCookieBanner from './banner';
 import { enableScriptsByCategories, enableIframesByCategories } from './enable';
-import { getNoBanner, getPolicyUrl, makeUrlAbsolute } from './settings';
+import {
+  getNoBanner,
+  getPolicyUrl,
+  getCookieDetailsUrl,
+  makeUrlAbsolute,
+} from './settings';
 
 /**
  * If cookie rules/regulations change and the cookie itself needs to change,
@@ -201,6 +206,11 @@ function shouldShowBanner() {
 
   // Do not show the banner if we are on the policy page.
   if (document.location.href === makeUrlAbsolute(getPolicyUrl())) {
+    return false;
+  }
+
+  // Do not show the banner if we are on the cookie details page.
+  if (document.location.href === makeUrlAbsolute(getCookieDetailsUrl())) {
     return false;
   }
 

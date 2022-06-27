@@ -20,6 +20,16 @@ export function getPolicyUrl() {
   return dataPolicyUrl;
 }
 
+export function getCookieDetailsUrl() {
+  let cookieDetailUrl = '/cookie-details';
+
+  if (scriptTag.getAttribute('data-cookie-details-url')) {
+    cookieDetailUrl = scriptTag.getAttribute('data-cookie-details-url');
+  }
+
+  return cookieDetailUrl;
+}
+
 /**
  * Ideally we would use the URL API here, but IE support is lacking.
  */
