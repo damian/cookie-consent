@@ -1,4 +1,8 @@
-import { getCookie as getRawCookie, createCookie as createRawCookie, deleteCookies } from './cookies';
+import {
+  getCookie as getRawCookie,
+  createCookie as createRawCookie,
+  deleteCookies,
+} from './cookies';
 import insertCookieBanner from './banner';
 import { enableScriptsByCategories, enableIframesByCategories } from './enable';
 import { getNoBanner, getPolicyUrl, makeUrlAbsolute } from './settings';
@@ -27,7 +31,7 @@ const COOKIE_TYPE = {
  * We need this switch to be able to totally disable the functionality of this
  * cookie-consent library for a co-ordinated cross-platform release.
  */
-const NO_BANNER = (process.env.NO_BANNER === 'true');
+const NO_BANNER = process && process.env && process.env.NO_BANNER === 'true';
 
 /* eslint-disable sort-keys */
 // Pre-defined cookie types in line with cookiebot categories
@@ -145,7 +149,9 @@ export function setConsentSetting(key, value) {
 function enableScriptsAndIframes() {
   const allCategories = ['preferences', 'statistics', 'marketing'];
   // Filter out categories that do not have user consent
-  const allowedCategories = allCategories.filter(category => getConsentSetting(category) === true);
+  const allowedCategories = allCategories.filter(
+    category => getConsentSetting(category) === true
+  );
 
   enableScriptsByCategories(allowedCategories);
   enableIframesByCategories(allowedCategories);
@@ -173,7 +179,7 @@ function acceptAnalyticsConsent() {
  * @param {string} route route to hit for logging
  */
 export function hitLoggingUrl(route) {
-  if (process.env.LOG_TO_SPLUNK === 'true') {
+  if (process && process.env && process.env.LOG_TO_SPLUNK === 'true') {
     const oReq = new XMLHttpRequest();
     oReq.open(
       'GET',
@@ -227,14 +233,16 @@ export function onload() {
   if (shouldShowBanner()) {
     if (NO_BANNER) {
       // If NO_BANNER mode, we need to set "implied consent" to every cookie type
-      setConsent({
-        necessary: true,
-        preferences: true,
-        statistics: true,
-        marketing: true,
-        consented: false,
-      },
-      COOKIE_TYPE.LONG);
+      setConsent(
+        {
+          necessary: true,
+          preferences: true,
+          statistics: true,
+          marketing: true,
+          consented: false,
+        },
+        COOKIE_TYPE.LONG
+      );
     } else {
       insertCookieBanner(acceptConsent, acceptAnalyticsConsent, hitLoggingUrl);
     }

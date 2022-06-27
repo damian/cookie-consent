@@ -6,7 +6,7 @@ export function createCookie(name, value, days, path, domain, secure) {
   let expires;
   if (days) {
     const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
     expires = date.toUTCString();
   } else {
     expires = '';
@@ -45,13 +45,16 @@ export function createCookie(name, value, days, path, domain, secure) {
  */
 function getAllCookies() {
   const cookiesString = document.cookie || '';
-  const cookiesArray = cookiesString.split(';')
+  const cookiesArray = cookiesString
+    .split(';')
     .filter(cookie => cookie !== '')
     .map(cookie => cookie.trim());
 
   // Turn the cookie array into an object of key/value pairs
   const cookies = cookiesArray.reduce((acc, currentValue) => {
-    const [key, value] = currentValue.split('=');
+    const arr = currentValue.split('=');
+    const key = arr[0];
+    const value = arr[1];
     const decodedValue = decodeURIComponent(value); // URI decoding
     acc[key] = decodedValue; // Assign the value to the object
     return acc;
@@ -75,25 +78,29 @@ export function deleteCookies() {
   const cookies = getAllCookies();
   const cookieNames = Object.keys(cookies);
   // We want to delete all cookies except for our consent cookie
-  const cookieNamesToDelete = cookieNames.filter(name => name !== 'nhsuk-cookie-consent');
+  const cookieNamesToDelete = cookieNames.filter(
+    name => name !== 'nhsuk-cookie-consent'
+  );
 
   // generate a list of domains that the cookie could possibly belong to
   const domainParts = window.location.hostname.split('.');
-  const domains = domainParts.map((domainPart, i) => { // eslint-disable-line arrow-body-style
+  const domains = domainParts.map((domainPart, i) => {
+    // eslint-disable-line arrow-body-style
     return domainParts.slice(i).join('.');
   });
 
   // generate a list of paths that the cookie could possibly belong to
   const pathname = window.location.pathname.replace(/\/$/, ''); // strip trailing slash
   const pathParts = pathname.split('/');
-  const paths = pathParts.map((pathPart, i) => { // eslint-disable-line arrow-body-style
+  const paths = pathParts.map((pathPart, i) => {
+    // eslint-disable-line arrow-body-style
     return pathParts.slice(0, i + 1).join('/') || '/';
   });
 
   // Loop over every combination of path and domain for each cookie we want to delete
-  cookieNamesToDelete.forEach((cookieName) => {
-    paths.forEach((path) => {
-      domains.forEach((domain) => {
+  cookieNamesToDelete.forEach(cookieName => {
+    paths.forEach(path => {
+      domains.forEach(domain => {
         createCookie(cookieName, '', -1, path, domain);
       });
     });

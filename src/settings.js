@@ -5,7 +5,7 @@ const scriptTag = document.currentScript;
 // get properties from the scriptTag for the policy URL
 export function getPolicyUrl() {
   let dataPolicyUrl = '/our-policies/cookies-policy/';
-  if (process.env.POLICY_URL) {
+  if (process.env && process.env.POLICY_URL) {
     dataPolicyUrl = process.env.POLICY_URL;
   }
 
@@ -33,7 +33,12 @@ export function makeUrlAbsolute(url) {
 
 // get properties from the scriptTag for noBanner
 export function getNoBanner() {
-  const defaults = (process.env.NO_BANNER === 'true');
+  let defaults = false;
+
+  if (process.env && process.env.NO_BANNER) {
+    defaults = process.env.NO_BANNER === 'true';
+  }
+
   if (!scriptTag) {
     return defaults;
   }
